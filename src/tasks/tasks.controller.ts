@@ -1,8 +1,8 @@
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { CreatTaskDto } from './dto/create-task.dto';
-import { Task } from './task.model';
+import { SearchTaskDto, Task } from './task.model';
 import { TasksService } from './tasks.service';
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 
 @Controller('tasks')
 export class TasksController {
@@ -20,7 +20,6 @@ export class TasksController {
 
     @Post()
     createTask(@Body() createTaskDto: CreatTaskDto): Task {
-        //console.log('body', body)
         return this._tasksService.createTask(createTaskDto)
     }
 
@@ -33,6 +32,13 @@ export class TasksController {
     updateTask(@Param("id") id: string, @Body() body: UpdateTaskDto): Task {
         body.id = id
         return this._tasksService.updateTask(body)
+    }
+
+
+    @Get("search/by")
+    search(@Query() searchTaskDto:SearchTaskDto):Task[]{
+    //   console.log(searchTaskDto)
+    return this._tasksService.search(searchTaskDto)
     }
 
 

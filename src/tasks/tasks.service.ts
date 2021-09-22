@@ -1,12 +1,13 @@
 import { CreatTaskDto } from './dto/create-task.dto';
 
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Task, TaskStatus } from './task.model';
+import { SearchTaskDto, Task, TaskStatus } from './task.model';
 import {v4 as uuid} from "uuid"
 import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Injectable()
 export class TasksService {
+    
    
  private tasks :Task[] = []
 
@@ -50,11 +51,24 @@ updateTask(body: UpdateTaskDto):Task {
     const [task , index]  = this.findTask(body.id)
     if(body.description) task.description = body.description
     if(body.title)task.title = body.title
+    if(body.status) task.status = body.status
 
     this.tasks[index] = task
     return task
 }
 
+
+search(searchTaskDto: SearchTaskDto):Task[] {
+let tasks = this.getAllTasks()
+
+if(searchTaskDto.status) tasks = tasks.filter(t => t.status === searchTaskDto.status)
+
+if(searchTaskDto.searchTerm) {
+    tasks = tasks.filter(t => t.title.includes(searchTaskDto.searchTerm)  || t.description.includes(searchTaskDto.searchTerm))
+}
+
+return tasks
+}
 
 
 }
