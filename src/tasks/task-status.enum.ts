@@ -6,7 +6,3 @@ export enum TaskStatus{
 
 }
 
-export class SearchTaskDto{
-    searchTerm:string
-    status:TaskStatus
-}
