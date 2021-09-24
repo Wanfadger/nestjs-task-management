@@ -3,7 +3,7 @@ import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersRepository } from './users.repository';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { retry } from 'rxjs';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +20,7 @@ export class AuthService {
 
     async login(authCredentialsDto: AuthCredentialsDto): Promise<string> {
         const user = await this._usersRepository.findOne({username: authCredentialsDto.username})
-        if(user && (user.password === authCredentialsDto.password)){
+        if(user && (await bcrypt.compare(authCredentialsDto.password, user.password))){
             return "success"
         }else{
             throw new UnauthorizedException("Inavlid Username or password")
