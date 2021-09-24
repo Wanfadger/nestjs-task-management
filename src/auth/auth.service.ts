@@ -2,7 +2,8 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersRepository } from './users.repository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { retry } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -17,9 +18,13 @@ export class AuthService {
         return this._usersRepository.createUser(authCredentialsDto)
     }
 
-    async login(authCredentialsDto: AuthCredentialsDto): Promise<User> {
-        const user = await this._usersRepository.findOne({username: authCredentialsDto.username, password: authCredentialsDto.password})
-        return user
+    async login(authCredentialsDto: AuthCredentialsDto): Promise<string> {
+        const user = await this._usersRepository.findOne({username: authCredentialsDto.username})
+        if(user && (user.password === authCredentialsDto.password)){
+            return "success"
+        }else{
+            throw new UnauthorizedException("Inavlid Username or password")
+        }
     }
 
 }
