@@ -1,3 +1,4 @@
+import { JwtStrategy } from './jwt-config/jwt.strategy';
 import { UsersRepository } from './users.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
@@ -12,11 +13,12 @@ import { JwtModule } from '@nestjs/jwt';
     PassportModule.register({defaultStrategy:"jwt"}),
     JwtModule.register({secret:"wanfadger" ,  signOptions:{
       expiresIn:3600,
-      issuer:"wanfadger-task-management-api",
-       
-    }})
+      issuer:"wanfadger-task-management-api",    
+    }} , 
+    )
   ],
-  providers: [AuthService],
-  controllers: [AuthController]
+  providers: [AuthService , JwtStrategy],
+  controllers: [AuthController],
+  exports:[JwtStrategy , PassportModule]
 })
 export class AuthModule {}
