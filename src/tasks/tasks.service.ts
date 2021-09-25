@@ -4,12 +4,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Task } from './task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreatTaskDto } from './dto/create-task.dto';
-import { TaskStatus } from './task-status.enum';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { SearchTaskDto } from './dto/search-task.dto';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class TasksService {
+   
 
     constructor(
         @InjectRepository(TaskRepository)
@@ -17,7 +18,7 @@ export class TasksService {
 
     }
 
-    async getAllTaskById(id: string): Promise<Task> {
+    async getTaskById(id: string): Promise<Task> {
         const taskFound = await this._repo.findOne(id)
         if (!taskFound) throw new NotFoundException(`Id  ${id} , Not found`)
         return { ...taskFound }
@@ -28,8 +29,13 @@ export class TasksService {
         return this._repo.searchTasks(new SearchTaskDto())
     }
 
-    createTask(creatTaskDto: CreatTaskDto): Promise<Task> {
-        return this._repo.createTask(creatTaskDto)
+    async getUserTasks(user: User): Promise<Task[]> {
+     
+        return await this._repo.find({user})
+    }
+
+    createTask(creatTaskDto: CreatTaskDto , _user:User): Promise<Task> {
+        return this._repo.createTask(creatTaskDto , _user)
     }
 
 
@@ -41,8 +47,9 @@ export class TasksService {
 
 
 
+
     async updateTask(updateTaskDto: UpdateTaskDto): Promise<Task> {
-        const task = await this.getAllTaskById(updateTaskDto.id)
+        const task = await this.getTaskById(updateTaskDto.id)
 
 
 
@@ -56,16 +63,14 @@ export class TasksService {
 
 
     search(searchTaskDto: SearchTaskDto):Promise<Task[]> {
-    // let tasks = this.getAllTasks()
-
-    // if(searchTaskDto.status) tasks = tasks.filter(t => t.status === searchTaskDto.status)
-
-    // if(searchTaskDto.searchTerm) {
-    //     tasks = tasks.filter(t => t.title.includes(searchTaskDto.searchTerm)  || t.description.includes(searchTaskDto.searchTerm))
-    // }
-
     return this._repo.searchTasks(searchTaskDto)
     }
+
+
+    searchUserTask(searchTaskDto: SearchTaskDto ,user: User): Promise<Task[]> {
+        return this._repo.searchUserTasks(searchTaskDto ,user)
+    }
+   
 
 
 }

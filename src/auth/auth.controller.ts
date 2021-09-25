@@ -18,14 +18,14 @@ export class AuthController {
 
     @Post('/login')
     login(@Body() authCredentialsDto:AuthCredentialsDto , @Req() req):Promise<{accessToken:string}>{
-      console.log(req)
+     // console.log(req)
        return this._authService.login(authCredentialsDto)
     }
 
     @Post("/test")
     @UseGuards(AuthGuard())
     test(@Request() req , @LOGGED_USER() loggedUser:User ){
-      console.log(req)
+     // console.log(req)
       console.log(loggedUser.username)
     }
     

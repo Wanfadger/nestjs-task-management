@@ -1,7 +1,7 @@
-import { IsNotEmpty, Matches, MaxLength, MinLength } from 'class-validator';
-import { IsString } from 'class-validator';
-import { Column } from 'typeorm';
-import { PrimaryGeneratedColumn , Entity } from 'typeorm';
+import { Task } from './../tasks/task.entity';
+import { IsNotEmpty, Matches, MaxLength, MinLength , IsString } from 'class-validator';
+import { Column, OneToMany ,PrimaryGeneratedColumn , Entity } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 
 @Entity()
@@ -21,7 +21,11 @@ export class User{
     @MinLength(4)
     @MaxLength(32)
     @Matches(/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$ / , {message:"password is weak"})
+    @Exclude({toPlainOnly:true})
     password:string
+
+    @OneToMany(_task => Task , task => task.user  , {eager:true} )
+    tasks:Task[]
 
 }
 

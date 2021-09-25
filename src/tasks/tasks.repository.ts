@@ -3,16 +3,19 @@ import { CreatTaskDto } from './dto/create-task.dto';
 import { Task } from './task.entity';
 import { EntityRepository, Repository } from "typeorm";
 import { TaskStatus } from './task-status.enum';
+import { User } from 'src/auth/user.entity';
 
 @EntityRepository(Task)
 export class TaskRepository extends Repository<Task>{
+   
 
-    async createTask(creatTaskDto:CreatTaskDto):Promise<Task>{
+    async createTask(creatTaskDto:CreatTaskDto ,  _user:User):Promise<Task>{
         const {title , description} = creatTaskDto
         const task:Task = this.create({
            title:title,
            description:description,
-           status:TaskStatus.OPEN   
+           status:TaskStatus.OPEN ,
+           user:_user 
        })//create object based on the repository
        await this.save(task)
         return task
@@ -35,5 +38,26 @@ export class TaskRepository extends Repository<Task>{
 
      return tasks
     }
+
+    async  searchUserTasks(searchTaskDto: SearchTaskDto , user: User): Promise<Task[]> {
+        const query = this.createQueryBuilder("task") //tasks provides away how task entity Task entity is referenced
+        query.where("task.user.id =:userId" , {userId:user.id})
+        
+      
+        if(searchTaskDto.status){
+          //  tasks = tasks.filter(t => t.status === searchTaskDto.status)
+          query.andWhere("task.status = :s" , {s:searchTaskDto.status}) 
+        }
+  
+        if(searchTaskDto.searchTerm){
+            query.andWhere("LOWER(task.title) LIKE :s" , {s:`%${searchTaskDto.searchTerm.toLocaleLowerCase()}%`})
+            .orWhere("LOWER(task.description) LIKE :s" , {s:`%${searchTaskDto.searchTerm.toLocaleLowerCase()}%`})          
+        }
+  
+        let tasks:Task[] =  await query.getMany()
+  
+       return tasks
+      }
+    
 
 }

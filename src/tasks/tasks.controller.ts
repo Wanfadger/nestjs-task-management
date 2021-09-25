@@ -5,6 +5,8 @@ import { CreatTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { SearchTaskDto } from './dto/search-task.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { LOGGED_USER } from 'src/auth/decorators/get-user.decorater';
+import { User } from 'src/auth/user.entity';
 
 @Controller('tasks')
 @UseGuards(AuthGuard())
@@ -16,14 +18,22 @@ export class TasksController {
         return this._tasksService.getAllTasks()
     }
 
-    @Get(":id")
-    getAllTaskById(@Param("id") id: string): Promise<Task> {
-        return this._tasksService.getAllTaskById(id)
+    @Get("/:id")
+    getTaskById(@Param("id") id: string): Promise<Task> {
+        // console.log("by id")
+        return this._tasksService.getTaskById(id)
+    }
+
+    @Get("/by/loggeduser")
+    getUserTasks(@LOGGED_USER() user:User): Promise<Task[]> {
+        // console.log("by user")
+        // console.log(user)
+        return this._tasksService.getUserTasks(user)
     }
 
     @Post()
-    createTask(@Body() createTaskDto: CreatTaskDto): Promise<Task> {
-        return  this._tasksService.createTask(createTaskDto)
+    createTask(@Body() createTaskDto: CreatTaskDto  , @LOGGED_USER() user:User): Promise<Task> {
+        return  this._tasksService.createTask(createTaskDto , user)
     }
 
     @Delete(":id")
@@ -40,8 +50,15 @@ export class TasksController {
 
     @Get("search/by")
     search(@Query() searchTaskDto:SearchTaskDto):Promise<Task[]>{
-      console.log(searchTaskDto)
+   //   console.log(searchTaskDto)
     return this._tasksService.search(searchTaskDto)
+    }
+
+
+    @Get("/search/by/loggeduser")
+    searchUserTask(@Query() searchTaskDto:SearchTaskDto  , @LOGGED_USER() user:User):Promise<Task[]>{
+   //   console.log(searchTaskDto)
+    return this._tasksService.searchUserTask(searchTaskDto , user)
     }
 
 
