@@ -18,8 +18,8 @@ export class TasksService {
 
     }
 
-    async getTaskById(id: string): Promise<Task> {
-        const taskFound = await this._repo.findOne(id)
+    async getTaskById(id: string , user:User): Promise<Task> {
+        const taskFound = await this._repo.findOne({where:{id , user}})
         if (!taskFound) throw new NotFoundException(`Id  ${id} , Not found`)
         return { ...taskFound }
     }
@@ -39,8 +39,8 @@ export class TasksService {
     }
 
 
-    async deleteTaskById(id: string): Promise<void> {
-        const result = await this._repo.delete(id)
+    async deleteTaskById(id: string , user:User): Promise<void> {
+        const result = await this._repo.delete({id , user})
         if (result.affected === 0) throw new NotFoundException(`Task With ID: ${id} not found`)
         console.log(result)
     }
@@ -48,8 +48,8 @@ export class TasksService {
 
 
 
-    async updateTask(updateTaskDto: UpdateTaskDto): Promise<Task> {
-        const task = await this.getTaskById(updateTaskDto.id)
+    async updateTask(updateTaskDto: UpdateTaskDto , user:User): Promise<Task> {
+        const task = await this.getTaskById(updateTaskDto.id , user)
 
 
 

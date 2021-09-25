@@ -19,10 +19,12 @@ export class TasksController {
     }
 
     @Get("/:id")
-    getTaskById(@Param("id") id: string): Promise<Task> {
+    getTaskById(@Param("id") id: string , @LOGGED_USER() user:User): Promise<Task> {
         // console.log("by id")
-        return this._tasksService.getTaskById(id)
+        return this._tasksService.getTaskById(id , user)
     }
+
+   
 
     @Get("/by/loggeduser")
     getUserTasks(@LOGGED_USER() user:User): Promise<Task[]> {
@@ -37,14 +39,14 @@ export class TasksController {
     }
 
     @Delete(":id")
-    deleteTaskById(@Param("id") id: string):Promise<void> {
-       return this._tasksService.deleteTaskById(id)
+    deleteTaskById(@Param("id") id: string , @LOGGED_USER() user:User):Promise<void> {
+       return this._tasksService.deleteTaskById(id , user)
     }
 
     @Put(":id")
-    updateTask(@Param("id") id: string, @Body() updateTaskDto: UpdateTaskDto): Promise<Task> {
+    updateTask(@Param("id") id: string, @Body() updateTaskDto: UpdateTaskDto , @LOGGED_USER() user:User): Promise<Task> {
         updateTaskDto.id = id
-        return this._tasksService.updateTask(updateTaskDto)
+        return this._tasksService.updateTask(updateTaskDto , user)
     }
 
 
